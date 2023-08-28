@@ -49,8 +49,9 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		return 0;
 	case WM_PAINT:
 		hdc=BeginPaint(hWnd, &ps);
-		SetTextAlign(hdc,TA_CENTER);
-		TextOut(hdc,rt.right/2, rt.bottom/2, "Center String",13);
+		MyPen = CreatePen(PS_SOLID, 5, RGB(0,0,255));
+		OldPen = (HPEN)SelectObject(hdc, MyPen);
+
 		MyBrush = (HBRUSH)GetStockObject(GRAY_BRUSH);
 		OldBrush = (HBRUSH)SelectObject(hdc,MyBrush);
 		
@@ -60,9 +61,12 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		DeleteObject(MyPen);
 		
 		SelectObject(hdc,OldBrush);
+		DeleteObject(MyBrush);
+
 		EndPaint(hWnd, &ps);
 		return 0;
 	case WM_DESTROY:
+
 		PostQuitMessage(0);
 		return 0;
 	case WM_SIZE:
