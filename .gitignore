@@ -1,0 +1,14 @@
+*.ipch
+*.dsp
+*.ncb
+*.opt
+*.plg
+
+*.log
+*.tlog
+*.obj
+*.idb
+*.pdb
+*.exe
+*.ilk
+*.VC.*
