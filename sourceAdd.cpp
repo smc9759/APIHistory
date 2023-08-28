@@ -1,10 +1,8 @@
-
 #include <windows.h>
-#include <time.h>
 
 LRESULT CALLBACK WndProc(HWND,UINT,WPARAM,LPARAM);
 HINSTANCE g_hInst;
-LPSTR lpszClass="Class";
+LPSTR lpszClass="Client";
 
 int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance
 		  ,LPSTR lpszCmdParam,int nCmdShow)
@@ -27,8 +25,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance
 	RegisterClass(&WndClass);
 
 	hWnd=CreateWindow(lpszClass,lpszClass,WS_OVERLAPPEDWINDOW,
-		  CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,
-		  NULL,(HMENU)NULL,hInstance,NULL);
+		CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,
+		NULL,(HMENU)NULL,hInstance,NULL);
 	ShowWindow(hWnd,nCmdShow);
 	
 	while(GetMessage(&Message,0,0,0)) {
@@ -36,55 +34,40 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance
 		DispatchMessage(&Message);
 	}
 	return Message.wParam;
-}
-
-void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
-{
-	HDC hdc;
-	int i;
-	hdc = GetDC(hWnd);
-	for (i=0; i<100; i++)
-		SetPixel(hdc,rand()%500, rand()%400,
-		RGB(rand()%256,rand()%256,rand()%256,));
-	ReleaseDC(hWnd, hdc);
-}
+} 
 
 LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 {
 	HDC hdc;
 	PAINTSTRUCT ps;
-	time_t mytime;
-	static HANDLE hTimer;
-	static char *str;
-	static RECT rt = {100, 100, 400, 120};
-
+	HBRUSH MyBrush, OldBrush;
+	HPEN MyPen, OldPen;
+	static RECT rt;
 	switch(iMessage) {
 	case WM_CREATE:
-		hTimer = (HANDLE)SetTimer(hWnd,1,1000,NULL);
-		SetTimer(hWnd, 2, 100, (TIMERPROC)TimerProc);
-		str = "";
-		SendMessage(hWnd, WM_TIMER, 1,0);
-		return 0;
-	case WM_TIMER:
-		switch(wParam){
-		case 1:
-			time(&mytime);
-			str = ctime(&mytime);			
-			InvalidateRect(hWnd,NULL,TRUE);
-
-			break;
-		}
+		GetClientRect(hWnd, &rt);
 		return 0;
 	case WM_PAINT:
 		hdc=BeginPaint(hWnd, &ps);
-		TextOut(hdc,100,100,str,strlen(str)-1);
+		SetTextAlign(hdc,TA_CENTER);
+		TextOut(hdc,rt.right/2, rt.bottom/2, "Center String",13);
+		MyBrush = (HBRUSH)GetStockObject(GRAY_BRUSH);
+		OldBrush = (HBRUSH)SelectObject(hdc,MyBrush);
+		
+		Rectangle(hdc,50,50,300,200);
+
+		SelectObject(hdc, OldPen);
+		DeleteObject(MyPen);
+		
+		SelectObject(hdc,OldBrush);
 		EndPaint(hWnd, &ps);
 		return 0;
 	case WM_DESTROY:
-		KillTimer(hWnd,1);
-		KillTimer(hWnd,2);
-
 		PostQuitMessage(0);
+		return 0;
+	case WM_SIZE:
+		GetClientRect(hWnd, &rt);
+		InvalidateRect(hWnd, NULL, TRUE);
 		return 0;
 	}
 	return(DefWindowProc(hWnd,iMessage,wParam,lParam));
