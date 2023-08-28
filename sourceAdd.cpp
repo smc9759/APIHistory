@@ -1,5 +1,6 @@
 
 #include <windows.h>
+#include <time.h>
 
 LRESULT CALLBACK WndProc(HWND,UINT,WPARAM,LPARAM);
 HINSTANCE g_hInst;
@@ -41,11 +42,30 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 {
 	HDC hdc;
 	PAINTSTRUCT ps;
+	time_t mytime;
+	static HANDLE hTimer;
+	static char *str;
+	static RECT rt = {100, 100, 400, 120};
+
 	switch(iMessage) {
 	case WM_CREATE:
+		hTimer = (HANDLE)SetTimer(hWnd,1,1000,NULL);
+		str = "";
+
+		return 0;
+	case WM_TIMER:
+		switch(wParam){
+		case 1:
+			time(&mytime);
+			str = ctime(&mytime);			
+			InvalidateRect(hWnd,&rt,TRUE);
+
+			break;
+		}
 		return 0;
 	case WM_PAINT:
 		hdc=BeginPaint(hWnd, &ps);
+		TextOut(hdc,100,100,str,strlen(str)-1);
 		EndPaint(hWnd, &ps);
 		return 0;
 	case WM_DESTROY:
