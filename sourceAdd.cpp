@@ -69,6 +69,8 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		EndPaint(hWnd, &ps);
 		return 0;
 	case WM_DESTROY:
+		KillTimer(hWnd,1);
+
 		PostQuitMessage(0);
 		return 0;
 	}
