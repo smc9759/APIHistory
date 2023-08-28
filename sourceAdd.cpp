@@ -38,6 +38,17 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance
 	return Message.wParam;
 }
 
+void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
+{
+	HDC hdc;
+	int i;
+	hdc = GetDC(hWnd);
+	for (i=0; i<100; i++)
+		SetPixel(hdc,rand()%500, rand()%400,
+		RGB(rand()%256,rand()%256,rand()%256,));
+	ReleaseDC(hWnd, hdc);
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 {
 	HDC hdc;
@@ -50,15 +61,16 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 	switch(iMessage) {
 	case WM_CREATE:
 		hTimer = (HANDLE)SetTimer(hWnd,1,1000,NULL);
+		SetTimer(hWnd, 2, 100, (TIMERPROC)TimerProc);
 		str = "";
-
+		SendMessage(hWnd, WM_TIMER, 1,0);
 		return 0;
 	case WM_TIMER:
 		switch(wParam){
 		case 1:
 			time(&mytime);
 			str = ctime(&mytime);			
-			InvalidateRect(hWnd,&rt,TRUE);
+			InvalidateRect(hWnd,NULL,TRUE);
 
 			break;
 		}
@@ -70,6 +82,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		return 0;
 	case WM_DESTROY:
 		KillTimer(hWnd,1);
+		KillTimer(hWnd,2);
 
 		PostQuitMessage(0);
 		return 0;
