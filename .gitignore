@@ -6,8 +6,3 @@
 *.exe
 *.ilk
 *.VC.*
-*.ipch
-*.dsp
-*.ncb
-*.opt
-*.plg
